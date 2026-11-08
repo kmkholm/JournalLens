@@ -1,0 +1,99 @@
+#mz-panel {
+  --mz-brand: #4338ca; --mz-gold: #22d3ee; --mz-line: #e4e8ee; --mz-muted: #5b6676;
+  --mz-q1: #10b981; --mz-q2: #f59e0b; --mz-q3: #f97316; --mz-q4: #ef4444;
+  margin: 10px 0 14px; border: 1px solid var(--mz-line); border-radius: 12px; overflow: hidden;
+  font: 13px/1.5 "Segoe UI", Tahoma, Arial, sans-serif; color: #0f1b2d; background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 27, 45, .08);
+}
+#mz-panel .mz-head {
+  display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; color: #fff;
+  background: linear-gradient(135deg, #0f172a 0%, #312e81 55%, #7c3aed 100%); border-bottom: 3px solid var(--mz-gold);
+}
+#mz-panel .mz-brand { font-size: 17px; font-weight: 800; }
+#mz-panel .mz-brand small { font-size: 12px; font-weight: 600; opacity: .85; margin-inline-start: 8px; }
+#mz-panel .mz-prog { font-weight: 700; font-size: 12.5px; }
+#mz-panel .mz-ctrl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 8px 14px; background: #fafbfd; border-bottom: 1px solid var(--mz-line); }
+#mz-panel .mz-ctrl input, #mz-panel .mz-ctrl select { font: inherit; padding: 3px 7px; border: 1px solid var(--mz-line); border-radius: 6px; }
+#mz-panel .mz-ctrl input { width: 170px; }
+#mz-panel button { font: inherit; font-weight: 700; padding: 4px 11px; border: 0; border-radius: 7px; background: var(--mz-brand); color: #fff; cursor: pointer; }
+#mz-panel button:disabled { opacity: .6; cursor: default; }
+#mz-panel #mz-refresh { background: #6c757d; }
+#mz-panel .mz-warn { margin: 8px 14px 0; padding: 7px 10px; background: #fff4e0; color: #8a5300; border-radius: 8px; font-weight: 700; }
+#mz-panel .mz-grp { padding: 8px 14px 4px; }
+#mz-panel h4 { margin: 0 0 6px; font-size: 13px; color: var(--mz-brand); }
+#mz-panel .mz-tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+#mz-panel .mz-t {
+  display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 5px 8px; border-radius: 9px;
+  background: #f1f3f7; color: #0f1b2d; border: 2px solid transparent;
+}
+#mz-panel .mz-t b { font-size: 19px; line-height: 1.1; }
+#mz-panel .mz-t span { font-size: 11.5px; font-weight: 700; }
+#mz-panel .mz-t small { font-size: 10px; font-weight: 600; opacity: .9; }
+#mz-panel .mz-t.mz-on { border-color: #0f1b2d; box-shadow: 0 0 0 2px var(--mz-gold); }
+#mz-panel .mz-t.mz-Q1 { background: var(--mz-q1); color: #fff; }
+#mz-panel .mz-t.mz-Q2 { background: var(--mz-q2); color: #fff; }
+#mz-panel .mz-t.mz-Q3 { background: var(--mz-q3); color: #fff; }
+#mz-panel .mz-t.mz-Q4 { background: var(--mz-q4); color: #fff; }
+#mz-panel .mz-t.mz-tno { background: #fdecec; color: #a61e1e; }
+#mz-panel .mz-t.mz-twos { background: #ede9fe; color: #5b21b6; }
+#mz-panel .mz-t.mz-trole { background: #e0e7ff; color: #4338ca; }
+#mz-panel .mz-note { font-size: 12px; color: var(--mz-muted); margin: 4px 0; }
+#mz-panel .mz-foot { padding: 6px 14px 9px; font-size: 11px; color: var(--mz-muted); border-top: 1px dashed var(--mz-line); margin-top: 6px; }
+
+.mz-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 2px; }
+.mz-b {
+  display: inline-block; padding: 1px 7px; border-radius: 999px; font: 700 11px/1.6 "Segoe UI", Tahoma, Arial, sans-serif;
+  background: #eef1f5; color: #3b4656; white-space: nowrap;
+}
+.mz-b.mz-Q1 { background: #10b981; color: #fff; }
+.mz-b.mz-Q2 { background: #f59e0b; color: #fff; }
+.mz-b.mz-Q3 { background: #f97316; color: #fff; }
+.mz-b.mz-Q4 { background: #ef4444; color: #fff; }
+.mz-b.mz-wos { background: #7c3aed; color: #fff; }
+.mz-b.mz-jif { background: #4338ca; color: #fff; }
+.mz-b.mz-no { background: #fdecec; color: #a61e1e; }
+.mz-b.mz-pos { background: #cffafe; color: #155e75; }
+.mz-b.mz-first, .mz-b.mz-sole { background: #22d3ee; color: #083344; }
+.mz-b.mz-last { background: #ede9fe; color: #5b21b6; }
+.mz-b.mz-wait { background: #f4f6f9; color: #8a94a3; }
+.mz-b.mz-cAs { background: #047857; color: #fff; }
+.mz-b.mz-cA { background: #22c55e; color: #fff; }
+.mz-b.mz-cB { background: #f59e0b; color: #fff; }
+.mz-b.mz-cC { background: #f97316; color: #fff; }
+#mz-panel .mz-t.mz-cAs { background: #047857; color: #fff; }
+#mz-panel .mz-t.mz-cA { background: #22c55e; color: #fff; }
+#mz-panel .mz-t.mz-cB { background: #f59e0b; color: #fff; }
+#mz-panel .mz-t.mz-cC { background: #f97316; color: #fff; }
+
+/* right-hand chart column on profile pages */
+#mz-charts {
+  margin: 0 0 14px; border: 1px solid #e4e8ee; border-radius: 12px; overflow: hidden; background: #fff;
+  font: 12px/1.45 "Segoe UI", Tahoma, Arial, sans-serif; color: #0f1b2d; box-shadow: 0 1px 3px rgba(15, 27, 45, .08);
+}
+#mz-charts:empty { display: none; }
+#mz-charts .mz-ch-head { padding: 8px 12px; font-weight: 800; font-size: 14px; color: #fff;
+  background: linear-gradient(135deg, #0f172a 0%, #312e81 55%, #7c3aed 100%); border-bottom: 3px solid #22d3ee; }
+#mz-charts .mz-ch { padding: 8px 12px 4px; border-bottom: 1px dashed #e4e8ee; }
+#mz-charts h5 { margin: 0 0 4px; font-size: 12.5px; color: #4338ca; }
+#mz-charts h5 small { color: #5b6676; font-weight: 600; }
+#mz-charts .mz-ch-foot { padding: 6px 12px 8px; font-size: 11px; color: #5b6676; }
+#mz-charts .mz-note { color: #5b6676; font-size: 11.5px; }
+
+/* summary bar on result pages */
+#mz-bar {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 12px; padding: 7px 10px;
+  border: 1px solid #e4e8ee; border-radius: 10px; background: #fafbfd; font: 12px/1.5 "Segoe UI", Tahoma, Arial, sans-serif;
+}
+#mz-bar .mz-brand { font-weight: 800; color: #4338ca; font-size: 13.5px; }
+#mz-bar #mz-prog { font-weight: 700; color: #5b6676; }
+#mz-bar #mz-sum { display: flex; flex-wrap: wrap; gap: 4px; }
+#mz-bar select, #mz-bar button { font: inherit; padding: 2px 8px; border-radius: 6px; border: 1px solid #e4e8ee; }
+#mz-bar button { background: #4338ca; color: #fff; border: 0; font-weight: 700; cursor: pointer; }
+#mz-bar .mz-warn { color: #8a5300; font-weight: 700; }
+
+.jl-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-right: 4px;
+  border-radius: 6px; background: #22d3ee; color: #0f172a; font: 900 10.5px/1 "Segoe UI", Arial, sans-serif; vertical-align: 1px; }
+#mz-bar .jl-mark { background: #4338ca; color: #fff; }
+#mz-panel .mz-dev { display: block; margin-top: 4px; }
+#mz-panel .mz-dev a, #mz-charts .mz-ch-foot a { color: #4338ca; font-weight: 700; }
+.mz-doi { font: 700 11px/1.6 Arial, sans-serif; color: #4338ca !important; padding: 1px 4px; }

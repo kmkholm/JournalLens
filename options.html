@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JournalLens — Settings</title>
+<link rel="stylesheet" href="popup.css">
+<style>
+  body { width: auto; max-width: 760px; margin: 0 auto; max-height: none; }
+  .card .body p { margin: 6px 0; }
+  textarea { width: 100%; min-height: 90px; font: 13px/1.5 Consolas, monospace; padding: 8px; border: 1.5px solid var(--line); border-radius: 8px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  button.b { padding: 7px 14px; border: 0; border-radius: 8px; background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  button.g { background: #6c757d; }
+  #status, #jstatus, #cstatus { font-weight: 700; }
+  ol { margin: 4px 0; padding-inline-start: 22px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="icons/icon48.png" alt="" width="34" height="34">
+    <div><div class="name">JournalLens — Settings</div><div class="tag">No third-party databases: Scopus, Clarivate and Crossref only</div></div></div>
+</header>
+
+<section class="card">
+  <h2><span class="dot au"></span>My name as it appears on papers</h2>
+  <div class="body">
+    <p>One variant per line (given name then family name), e.g. <span class="num">Ahmad Al-Saleh</span> or <span class="num">A. Al-Saleh</span>. Matching uses the family name plus the first initial.</p>
+    <textarea id="names" placeholder="Ahmad Al-Saleh&#10;A. Al-Saleh"></textarea>
+    <div class="row"><button class="b" id="saveNames">Save</button><span id="status"></span></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="dot wos"></span>Google Scholar</h2>
+  <div class="body">
+    <p>JournalLens runs by itself on Google Scholar: profile pages get a statistics panel and a badge row under every paper; search and "Cited by" pages get a badge row under every result.</p>
+    <label class="row"><input type="checkbox" id="auto"> Analyse Scholar pages automatically when they open</label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="dot jcr"></span>Official Impact Factor file (JCR)</h2>
+  <div class="body">
+    <p>The Journal Impact Factor belongs to Clarivate and is not published for free; extensions that "show" it without a subscription copy unofficial lists, which is why they are wrong. JournalLens shows it only from the official JCR export:</p>
+    <ol>
+      <li>Open <a href="https://jcr.clarivate.com/jcr/browse-journals" target="_blank">jcr.clarivate.com → Journals</a> through your institution.</li>
+      <li>Choose the JCR year and editions (SCIE, SSCI, AHCI, ESCI), then <b>Export → CSV</b> (if you get Excel, save it as CSV UTF-8).</li>
+      <li>Import it here. The file is read locally and sent nowhere.</li>
+    </ol>
+    <div class="row"><input type="file" id="file" accept=".csv,text/csv"><button class="b g" id="clearJcr">Remove JCR file</button></div>
+    <p id="jstatus"></p>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="dot sc"></span>Cache</h2>
+  <div class="body">
+    <p>Scopus results are kept for 7 days, Master Journal List results for 30 days and paper matches for 30 days. "Refresh" bypasses the cache.</p>
+    <div class="row"><button class="b g" id="clearCache">Clear cache</button><span id="cstatus"></span></div>
+  </div>
+</section>
+<section class="card">
+  <h2><span class="dot jcr"></span>About</h2>
+  <div class="body about">
+    <img src="icons/icon128.png" alt="" width="64" height="64">
+    <div>
+      <div class="who">JournalLens <span class="num" id="ver"></span></div>
+      <div>Developed by <b>Dr. Mohammed Tawfik</b></div>
+      <div>Website: <a href="https://kmkholm.github.io/" target="_blank">https://kmkholm.github.io/</a></div>
+      <div>E-mail: <a href="mailto:kmkhol01@gmail.com">kmkhol01@gmail.com</a></div>
+    </div>
+  </div>
+</section>
+<script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JournalLens</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <img src="icons/icon48.png" alt="" width="34" height="34">
+    <div>
+      <div class="name">JournalLens</div>
+      <div class="tag">Journal metrics from official sources only</div>
+    </div>
+  </div>
+  <a id="opts" class="gear" href="#" title="Settings">⚙</a>
+</header>
+
+<form id="search" class="search">
+  <input id="q" type="text" placeholder="ISSN, DOI or journal name" autocomplete="off">
+  <button type="submit">Search</button>
+</form>
+
+<div id="picks" class="picks" hidden></div>
+
+<section id="journal" class="journal" hidden>
+  <div class="jtitle" id="jtitle"></div>
+  <div class="jsub" id="jsub"></div>
+</section>
+
+<section class="card" id="c-scopus" hidden>
+  <h2><span class="dot sc"></span>Scopus — CiteScore &amp; rank</h2>
+  <div class="body"></div>
+</section>
+
+<section class="card" id="c-wos" hidden>
+  <h2><span class="dot wos"></span>Web of Science — indexing</h2>
+  <div class="body"></div>
+</section>
+
+<section class="card" id="c-jcr" hidden>
+  <h2><span class="dot jcr"></span>Impact Factor — JCR (Clarivate)</h2>
+  <div class="body"></div>
+</section>
+
+<section class="card" id="c-auth" hidden>
+  <h2><span class="dot au"></span>Author order</h2>
+  <div class="body"></div>
+</section>
+
+<div id="empty" class="empty" hidden></div>
+
+<footer class="foot">
+  <a href="#" id="refresh">Refresh data (bypass cache)</a>
+  <div class="dev">Developed by <b>Dr. Mohammed Tawfik</b> · <a href="https://kmkholm.github.io/" target="_blank">kmkholm.github.io</a> · <a href="mailto:kmkhol01@gmail.com">kmkhol01@gmail.com</a></div>
+</footer>
+<script src="common.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

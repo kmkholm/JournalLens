@@ -1,0 +1,128 @@
+{
+  "manifest_version": 3,
+  "name": "JournalLens — Journal Rank, Impact & Author Order",
+  "short_name": "JournalLens",
+  "version": "2.0.0",
+  "description": "Scopus quartile & CiteScore, Web of Science index, Impact Factor and CORE conference rank from official sources, with author order and charts on Google Scholar. By Dr. Mohammed Tawfik.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "JournalLens",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.scopus.com/*",
+    "https://mjl.clarivate.com/*",
+    "https://api.crossref.org/*",
+    "https://portal.core.edu.au/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://scholar.google.com/citations*",
+        "https://scholar.google.com.sa/citations*",
+        "https://scholar.google.com.eg/citations*",
+        "https://scholar.google.jo/citations*",
+        "https://scholar.google.ae/citations*",
+        "https://scholar.google.com.qa/citations*",
+        "https://scholar.google.com.kw/citations*",
+        "https://scholar.google.com.om/citations*",
+        "https://scholar.google.iq/citations*",
+        "https://scholar.google.co.uk/citations*",
+        "https://scholar.google.de/citations*",
+        "https://scholar.google.fr/citations*",
+        "https://scholar.google.es/citations*",
+        "https://scholar.google.it/citations*",
+        "https://scholar.google.nl/citations*",
+        "https://scholar.google.ca/citations*",
+        "https://scholar.google.com.au/citations*",
+        "https://scholar.google.co.in/citations*",
+        "https://scholar.google.com.pk/citations*",
+        "https://scholar.google.com.my/citations*",
+        "https://scholar.google.com.tr/citations*",
+        "https://scholar.google.co.id/citations*",
+        "https://scholar.google.com.br/citations*",
+        "https://scholar.google.ru/citations*",
+        "https://scholar.google.co.jp/citations*",
+        "https://scholar.google.com.hk/citations*",
+        "https://scholar.google.com.tw/citations*",
+        "https://scholar.google.co.kr/citations*",
+        "https://scholar.google.com.ng/citations*",
+        "https://scholar.google.co.za/citations*",
+        "https://scholar.google.dz/citations*",
+        "https://scholar.google.co.ma/citations*",
+        "https://scholar.google.tn/citations*",
+        "https://scholar.google.ps/citations*",
+        "https://scholar.google.com.ly/citations*",
+        "https://scholar.google.com.lb/citations*",
+        "https://scholar.google.com/scholar*",
+        "https://scholar.google.com.sa/scholar*",
+        "https://scholar.google.com.eg/scholar*",
+        "https://scholar.google.jo/scholar*",
+        "https://scholar.google.ae/scholar*",
+        "https://scholar.google.com.qa/scholar*",
+        "https://scholar.google.com.kw/scholar*",
+        "https://scholar.google.com.om/scholar*",
+        "https://scholar.google.iq/scholar*",
+        "https://scholar.google.co.uk/scholar*",
+        "https://scholar.google.de/scholar*",
+        "https://scholar.google.fr/scholar*",
+        "https://scholar.google.es/scholar*",
+        "https://scholar.google.it/scholar*",
+        "https://scholar.google.nl/scholar*",
+        "https://scholar.google.ca/scholar*",
+        "https://scholar.google.com.au/scholar*",
+        "https://scholar.google.co.in/scholar*",
+        "https://scholar.google.com.pk/scholar*",
+        "https://scholar.google.com.my/scholar*",
+        "https://scholar.google.com.tr/scholar*",
+        "https://scholar.google.co.id/scholar*",
+        "https://scholar.google.com.br/scholar*",
+        "https://scholar.google.ru/scholar*",
+        "https://scholar.google.co.jp/scholar*",
+        "https://scholar.google.com.hk/scholar*",
+        "https://scholar.google.com.tw/scholar*",
+        "https://scholar.google.co.kr/scholar*",
+        "https://scholar.google.com.ng/scholar*",
+        "https://scholar.google.co.za/scholar*",
+        "https://scholar.google.dz/scholar*",
+        "https://scholar.google.co.ma/scholar*",
+        "https://scholar.google.tn/scholar*",
+        "https://scholar.google.ps/scholar*",
+        "https://scholar.google.com.ly/scholar*",
+        "https://scholar.google.com.lb/scholar*"
+      ],
+      "js": [
+        "common.js",
+        "scholar.js"
+      ],
+      "css": [
+        "scholar.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "author": {
+    "email": "kmkhol01@gmail.com"
+  },
+  "homepage_url": "https://kmkholm.github.io/"
+}
