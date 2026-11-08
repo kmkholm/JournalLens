@@ -233,18 +233,21 @@
     ui.id = 'mz-panel';
     ui.innerHTML = `
       <div class="mz-head"><div class="mz-brand"><span class="jl-mark">JL</span> JournalLens <small>${esc(profileName)}</small></div><div class="mz-prog" id="mz-prog"></div></div>
-      <div class="mz-ctrl">
-        <label>Owner's name on papers: <input id="mz-owner" type="text"></label>
-        <label>Quartile by: <select id="mz-mode"><option value="current">Latest official CiteScore</option><option value="pub">Publication year</option></select></label>
-        <button id="mz-all">Load &amp; analyse all papers</button>
-        <button id="mz-copy">Copy results</button>
-        <button id="mz-refresh" title="Bypass the cache">Refresh</button>
-      </div>
+      <div class="mz-sumline"><span id="mz-chips"></span>
+        <span class="mz-actions"><button id="mz-all">Load all papers</button><button id="mz-more" class="mz-ghost">Details ▾</button></span></div>
       <div id="mz-alert"></div>
-      <div id="mz-stats"></div>
-      <div class="mz-foot">Sources: Scopus (CiteScore, quartile) · Clarivate Master Journal List (WoS) · imported JCR file (IF) · Crossref (DOI, author list).
-        Click any tile to filter the list. Quartiles follow the Scopus definition (Q1 = 75th percentile and above).
-        <span class="mz-dev">JournalLens by <b>Dr. Mohammed Tawfik</b> · <a href="https://kmkholm.github.io/" target="_blank">kmkholm.github.io</a> · <a href="mailto:kmkhol01@gmail.com">kmkhol01@gmail.com</a></span></div>`;
+      <div id="mz-details" hidden>
+        <div class="mz-ctrl">
+          <label>Owner's name on papers: <input id="mz-owner" type="text"></label>
+          <label>Quartile by: <select id="mz-mode"><option value="current">Latest official CiteScore</option><option value="pub">Publication year</option></select></label>
+          <button id="mz-copy">Copy results</button>
+          <button id="mz-refresh" title="Bypass the cache">Refresh</button>
+        </div>
+        <div id="mz-stats"></div>
+        <div class="mz-foot">Sources: Scopus · Clarivate Master Journal List · imported JCR file · CORE · Crossref. Click a number to filter the list.
+          Quartiles follow the Scopus definition (Q1 = 75th percentile and above).
+          <span class="mz-dev">JournalLens by <b>Dr. Mohammed Tawfik</b> · <a href="https://kmkholm.github.io/" target="_blank">kmkholm.github.io</a> · <a href="mailto:kmkhol01@gmail.com">kmkhol01@gmail.com</a></span></div>
+      </div>`;
     const anchor = document.querySelector('#gsc_a_tw') || document.querySelector('#gsc_a_t');
     anchor.parentNode.insertBefore(ui, anchor);
   } else {
@@ -274,6 +277,11 @@
       renderStats();
     });
     $('#mz-all').addEventListener('click', loadAll);
+    const setDetails = open => { $('#mz-details').hidden = !open; $('#mz-more').textContent = open ? 'Details ▴' : 'Details ▾'; };
+    chrome.storage.local.get('jlDetailsOpen').then(o => setDetails(!!o.jlDetailsOpen));
+    $('#mz-more').addEventListener('click', () => {
+      const open = $('#mz-details').hidden; setDetails(open); chrome.storage.local.set({ jlDetailsOpen: open });
+    });
     $('#mz-copy').addEventListener('click', copyResults);
   }
 
@@ -332,75 +340,85 @@
       <div class="mz-grp"><h4>Conferences (CORE / ICORE ranking)</h4><div class="mz-tiles">${coreTiles}</div></div>
       <div class="mz-grp"><h4>Position of ${esc(S.owner || 'the profile owner')} in the author list</h4><div class="mz-tiles">${roleTiles}</div>
         <div class="mz-note">Scopus Q1 as first author: <b>${q1first}</b> · Papers analysed: <b>${total}</b></div></div>`;
+    const chip = (id, label, n, cls) => `<button class="mz-b mz-chip ${cls}${S.filter === id ? ' mz-on' : ''}" data-f="${id}">${label} <b>${n}</b></button>`;
+    $('#mz-chips').innerHTML = ['Q1', 'Q2', 'Q3', 'Q4'].map(q => chip('s:' + q, q, count(r => sb(r) === q), 'mz-' + q)).join('')
+      + chip('s:none', 'No Scopus', count(r => sb(r) === 'none'), 'mz-no')
+      + chip('w:any', 'WoS', count(r => /^(SCIE|SSCI|AHCI|ESCI)$/.test(cl.get(r).wos)), 'mz-wos')
+      + chip('c:top', 'CORE A*/A', count(r => ['A*', 'A'].includes(cb(r))), 'mz-cAs')
+      + chip('a:first', '1st author', count(r => r.role === 'first'), 'mz-first');
     renderCharts(recs, cl, sb, cb);
-    $('#mz-stats').querySelectorAll('.mz-t').forEach(b => b.onclick = () => {
+    ui.querySelectorAll('#mz-stats .mz-t, #mz-chips .mz-chip').forEach(b => b.onclick = () => {
       S.filter = S.filter === b.dataset.f ? null : b.dataset.f;
       for (const r of S.recs.values()) applyFilter(r);
       renderStats();
     });
   }
 
-  // ---------------- charts (right-hand column of the profile) ----------------
-  const COL = { Q1: '#10b981', Q2: '#f59e0b', Q3: '#f97316', Q4: '#ef4444', none: '#e7a3a3', conf: '#7c3aed', other: '#cfd6df',
-    SCIE: '#4338ca', SSCI: '#1971c2', AHCI: '#4dabf7', ESCI: '#a5d8ff', 'A*': '#047857', A: '#22c55e', B: '#f59e0b', C: '#f97316',
-    first: '#22d3ee', last: '#7c3aed', sole: '#4338ca', middle: '#9aa5b5', unknown: '#e4e8ee' };
+  // ---------------- charts (right-hand column, under the co-authors list) ----------------
+  const COL = { Q1: '#10b981', Q2: '#f59e0b', Q3: '#f97316', Q4: '#ef4444', none: '#fca5a5', conf: '#7c3aed', other: '#cbd5e1',
+    SCIE: '#4338ca', SSCI: '#6366f1', AHCI: '#a5b4fc', ESCI: '#c7d2fe', 'A*': '#047857', A: '#22c55e', B: '#f59e0b', C: '#f97316',
+    first: '#22d3ee', last: '#7c3aed', sole: '#4338ca', middle: '#94a3b8', unknown: '#e2e8f0' };
+  const W = 260;
   function hbars(items) {
-    const max = Math.max(1, ...items.map(i => i.n)), W = 280, rh = 21;
-    return `<svg viewBox="0 0 ${W} ${items.length * rh + 4}" width="100%" role="img">${items.map((it, i) => {
-      const w = Math.round((W - 128) * it.n / max), y = i * rh + 2;
-      return `<text x="0" y="${y + 14}" font-size="11" fill="#3b4656">${esc(it.label)}</text>`
-        + `<rect x="96" y="${y + 3}" width="${it.n ? Math.max(w, 3) : 0}" height="15" rx="3" fill="${it.color}"/>`
-        + `<text x="${101 + w}" y="${y + 15}" font-size="11.5" font-weight="700" fill="#0f1b2d">${it.n}</text>`;
+    const max = Math.max(1, ...items.map(i => i.n)), rh = 16;
+    return `<svg viewBox="0 0 ${W} ${items.length * rh + 2}" width="100%" role="img">${items.map((it, i) => {
+      const w = Math.round((W - 112) * it.n / max), y = i * rh + 1;
+      return `<text x="0" y="${y + 11}" font-size="10" fill="#475569">${esc(it.label)}</text>`
+        + `<rect x="82" y="${y + 2}" width="${it.n ? Math.max(w, 2) : 0}" height="11" rx="3" fill="${it.color}"/>`
+        + `<text x="${86 + w}" y="${y + 11}" font-size="10" font-weight="700" fill="#0f172a">${it.n}</text>`;
     }).join('')}</svg>`;
   }
-  function donut(items, center) {
-    const tot = items.reduce((s, i) => s + i.n, 0), R = 48, r = 29, cx = 58, cy = 60, mid = (R + r) / 2;
-    const pt = (a, rad) => `${(cx + rad * Math.cos(a)).toFixed(2)},${(cy + rad * Math.sin(a)).toFixed(2)}`;
-    let a0 = -Math.PI / 2, g = '';
-    const live = items.filter(i => i.n);
-    if (!tot) g = `<circle cx="${cx}" cy="${cy}" r="${mid}" fill="none" stroke="#eef1f5" stroke-width="${R - r}"/>`;
-    else if (live.length === 1) g = `<circle cx="${cx}" cy="${cy}" r="${mid}" fill="none" stroke="${live[0].color}" stroke-width="${R - r}"/>`;
-    else for (const it of live) {
-      const a1 = a0 + 2 * Math.PI * it.n / tot, big = a1 - a0 > Math.PI ? 1 : 0;
-      g += `<path d="M${pt(a0, R)} A${R},${R} 0 ${big} 1 ${pt(a1, R)} L${pt(a1, r)} A${r},${r} 0 ${big} 0 ${pt(a0, r)} Z" fill="${it.color}"/>`;
-      a0 = a1;
+  // one 100 % bar per dimension: compact replacement for several donuts
+  function shareBar(label, items) {
+    const tot = items.reduce((s, i) => s + i.n, 0);
+    let x = 0, g = '';
+    for (const it of items) {
+      if (!it.n) continue;
+      const w = (W - 4) * it.n / tot;
+      g += `<rect x="${x.toFixed(1)}" y="14" width="${w.toFixed(1)}" height="10" fill="${it.color}"><title>${esc(it.label)}: ${it.n}</title></rect>`;
+      x += w;
     }
-    const legend = items.map((it, i) => `<g transform="translate(126,${8 + i * 18})"><rect width="11" height="11" rx="2" fill="${it.color}"/>`
-      + `<text x="16" y="10" font-size="11" fill="#3b4656">${esc(it.label)} <tspan font-weight="700" fill="#0f1b2d">${it.n}</tspan></text></g>`).join('');
-    return `<svg viewBox="0 0 280 ${Math.max(122, items.length * 18 + 12)}" width="100%" role="img">${g}`
-      + `<text x="${cx}" y="${cy + 6}" text-anchor="middle" font-size="17" font-weight="800" fill="#0f1b2d">${center}</text>${legend}</svg>`;
+    if (!tot) g = `<rect x="0" y="14" width="${W - 4}" height="10" rx="3" fill="#f1f5f9"/>`;
+    const legend = items.filter(i => i.n).map(i => `<tspan fill="${i.color === '#cbd5e1' || i.color === '#e2e8f0' ? '#64748b' : i.color}" font-weight="700">${esc(i.label)} ${i.n}</tspan>`).join('  ');
+    return `<svg viewBox="0 0 ${W} 38" width="100%" role="img"><text x="0" y="10" font-size="10.5" font-weight="700" fill="#312e81">${esc(label)}</text>`
+      + `<g>${g}</g><text x="0" y="35" font-size="9.5">${legend || '<tspan fill="#94a3b8">—</tspan>'}</text></svg>`;
   }
   function stackedYears(recs, cat) {
     const keys = ['Q1', 'Q2', 'Q3', 'Q4', 'conf', 'other'];
     const by = {};
-    for (const r of recs) { const k = cat(r); if (!k || !r.p.year) continue; (by[r.p.year] = by[r.p.year] || {})[k] = ((by[r.p.year] || {})[k] || 0) + 1; }
+    for (const r of recs) { const k = cat(r); if (!k || !r.p.year) continue; (by[r.p.year] = by[r.p.year] || {})[k] = (by[r.p.year][k] || 0) + 1; }
     const years = Object.keys(by).map(Number).sort((a, b) => a - b).slice(-12);
-    if (!years.length) return '<div class="mz-note">No dated papers yet.</div>';
+    if (!years.length) return '';
     const tot = y => keys.reduce((s, k) => s + (by[y][k] || 0), 0);
-    const max = Math.max(1, ...years.map(tot)), W = 280, H = 140, base = 100, bw = Math.min(20, (W - 20) / years.length - 4);
+    const max = Math.max(1, ...years.map(tot)), base = 70, step = (W - 10) / years.length, bw = Math.min(14, step - 4);
     let g = '';
     years.forEach((y, i) => {
-      const x = 14 + i * ((W - 20) / years.length);
+      const x = 6 + i * step;
       let top = base;
       for (const k of keys) {
         const n = by[y][k] || 0; if (!n) continue;
-        const h = (base - 12) * n / max; top -= h;
-        g += `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${COL[k]}"><title>${y} · ${k === 'other' ? 'other' : k}: ${n}</title></rect>`;
+        const h = (base - 10) * n / max; top -= h;
+        g += `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${COL[k]}"><title>${y} · ${k}: ${n}</title></rect>`;
       }
-      g += `<text x="${(x + bw / 2).toFixed(1)}" y="${(top - 3).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f1b2d">${tot(y)}</text>`
-        + `<text x="${(x + bw / 2).toFixed(1)}" y="${base + 13}" text-anchor="middle" font-size="9.5" fill="#5b6676">'${String(y).slice(2)}</text>`;
+      g += `<text x="${(x + bw / 2).toFixed(1)}" y="${(top - 2).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0f172a">${tot(y)}</text>`
+        + `<text x="${(x + bw / 2).toFixed(1)}" y="${base + 10}" text-anchor="middle" font-size="8.5" fill="#64748b">'${String(y).slice(2)}</text>`;
     });
-    const legend = [['Q1', 'Q1'], ['Q2', 'Q2'], ['Q3', 'Q3'], ['Q4', 'Q4'], ['conf', 'Conf'], ['other', 'Other']]
-      .map(([k, l], i) => `<g transform="translate(${4 + i * 46},${H - 4})"><rect y="-9" width="9" height="9" rx="2" fill="${COL[k]}"/><text x="12" font-size="10" fill="#3b4656">${l}</text></g>`).join('');
-    return `<svg viewBox="0 0 ${W} ${H + 4}" width="100%" role="img"><line x1="10" x2="${W - 4}" y1="${base}" y2="${base}" stroke="#e4e8ee"/>${g}${legend}</svg>`;
+    return `<svg viewBox="0 0 ${W} 84" width="100%" role="img"><line x1="2" x2="${W - 2}" y1="${base}" y2="${base}" stroke="#e2e8f0"/>${g}</svg>`;
   }
 
-  let chartCard = null, chartTimer = null;
+  let chartCard = null, chartTimer = null, chartsOpen = true;
   if (MODE === 'profile') {
     chartCard = document.createElement('div');
     chartCard.id = 'mz-charts';
+    const co = document.querySelector('#gsc_rsb_co');
     const rsb = document.querySelector('#gsc_rsb');
-    if (rsb) rsb.insertBefore(chartCard, rsb.firstChild); else ui.appendChild(chartCard);
+    if (co) co.after(chartCard); else if (rsb) rsb.appendChild(chartCard); else ui.appendChild(chartCard);
+    chrome.storage.local.get('jlChartsOpen').then(o => { if (o.jlChartsOpen === false) { chartsOpen = false; chartCard.classList.add('mz-closed'); } });
+    chartCard.addEventListener('click', e => {
+      if (!e.target.closest('.mz-ch-head')) return;
+      chartsOpen = !chartsOpen; chartCard.classList.toggle('mz-closed', !chartsOpen);
+      chrome.storage.local.set({ jlChartsOpen: chartsOpen });
+    });
   }
   function renderCharts(recs, cl, sb, cb) {
     if (!chartCard) return;
@@ -408,27 +426,24 @@
     chartTimer = setTimeout(() => {
       const n = f => recs.filter(f).length;
       const yearCat = r => { const b = sb(r); return b === 'pending' ? '' : /^Q[1-4]$/.test(b) ? b : b === 'conf' ? 'conf' : 'other'; };
-      const journals = n(r => /^Q[1-4]$/.test(sb(r)));
-      const wosIn = n(r => ['SCIE', 'SSCI', 'AHCI', 'ESCI'].includes(cl.get(r).wos));
-      chartCard.innerHTML = `<div class="mz-ch-head"><span class="jl-mark">JL</span> JournalLens · ${recs.length} papers</div>
-        <div class="mz-ch"><h5>Scopus quartiles <small>(${S.qMode === 'pub' ? 'publication year' : 'latest CiteScore'})</small></h5>${hbars([
-          ...['Q1', 'Q2', 'Q3', 'Q4'].map(q => ({ label: 'Scopus ' + q, n: n(r => sb(r) === q), color: COL[q] })),
+      const years = stackedYears(recs, yearCat);
+      chartCard.innerHTML = `<div class="mz-ch-head"><span class="jl-mark">JL</span> JournalLens <small>${recs.length} papers</small><span class="mz-tog">▾</span></div>
+        <div class="mz-ch-body">
+        <div class="mz-ch"><h5>Scopus quartiles</h5>${hbars([
+          ...['Q1', 'Q2', 'Q3', 'Q4'].map(q => ({ label: q, n: n(r => sb(r) === q), color: COL[q] })),
           { label: 'Not in Scopus', n: n(r => sb(r) === 'none'), color: COL.none },
-          { label: 'Conf / book', n: n(r => sb(r) === 'conf'), color: COL.conf },
-          { label: 'Preprint / other', n: n(r => ['preprint', 'unresolved', 'nr'].includes(sb(r))), color: COL.other }])}</div>
-        <div class="mz-ch"><h5>Papers per year</h5>${stackedYears(recs, yearCat)}</div>
-        <div class="mz-ch"><h5>Web of Science</h5>${donut([
-          ...['SCIE', 'SSCI', 'ESCI', 'AHCI'].map(a => ({ label: a, n: n(r => cl.get(r).wos === a), color: COL[a] })),
-          { label: 'Not in WoS', n: n(r => cl.get(r).wos === 'none'), color: COL.none }], wosIn)}</div>
-        <div class="mz-ch"><h5>Conferences (CORE)</h5>${hbars([
-          ...['A*', 'A', 'B', 'C'].map(k => ({ label: 'CORE ' + k, n: n(r => cb(r) === k), color: COL[k] })),
-          { label: 'Other rank', n: n(r => cb(r) === 'other'), color: COL.other },
-          { label: 'Not in CORE', n: n(r => cb(r) === 'none'), color: COL.none }])}</div>
-        <div class="mz-ch"><h5>${esc(S.owner || 'Owner')} — author position</h5>${donut(
-          [['first', 'First'], ['last', 'Last'], ['sole', 'Sole'], ['middle', 'Middle'], ['unknown', 'Unknown']]
-            .map(([k, l]) => ({ label: l, n: n(r => r.role === k && r.state !== 'loading'), color: COL[k] })),
-          n(r => r.role === 'first'))}</div>
-        <div class="mz-ch-foot">${journals} papers in ranked Scopus journals · ${wosIn} in WoS Core Collection<br><a href="https://kmkholm.github.io/" target="_blank">JournalLens · Dr. Mohammed Tawfik</a></div>`;
+          { label: 'Conf / book', n: n(r => sb(r) === 'conf'), color: COL.conf }])}</div>
+        ${years ? `<div class="mz-ch"><h5>Per year</h5>${years}</div>` : ''}
+        <div class="mz-ch">
+          ${shareBar('Web of Science', [...['SCIE', 'SSCI', 'ESCI', 'AHCI'].map(a => ({ label: a, n: n(r => cl.get(r).wos === a), color: COL[a] })),
+            { label: 'None', n: n(r => cl.get(r).wos === 'none'), color: COL.none }])}
+          ${shareBar('CORE conferences', [...['A*', 'A', 'B', 'C'].map(k => ({ label: k, n: n(r => cb(r) === k), color: COL[k] })),
+            { label: 'Other', n: n(r => cb(r) === 'other'), color: COL.other }, { label: 'None', n: n(r => cb(r) === 'none'), color: COL.none }])}
+          ${shareBar('Author position', [['first', 'First'], ['last', 'Last'], ['sole', 'Sole'], ['middle', 'Middle'], ['unknown', '?']]
+            .map(([k, l]) => ({ label: l, n: n(r => r.role === k && r.state !== 'loading'), color: COL[k] })))}
+        </div>
+        <div class="mz-ch-foot"><a href="https://kmkholm.github.io/" target="_blank">JournalLens · Dr. Mohammed Tawfik</a></div>
+        </div>`;
     }, 250);
   }
 
@@ -437,10 +452,10 @@
     const [g, v] = S.filter.split(':');
     const c = classify(rec);
     if (g === 's') { const b = scopusBucket(rec, c); return v === 'unresolved' ? (b === 'unresolved' || b === 'nr') : b === v; }
-    if (g === 'w') return c.wos === v;
+    if (g === 'w') return v === 'any' ? /^(SCIE|SSCI|AHCI|ESCI)$/.test(c.wos) : c.wos === v;
     if (g === 'j') return v === 'none' ? (rec.jcr && rec.jcr.imported && !rec.jcr.rows.length) : c.jifQ === v;
     if (g === 'a') return rec.role === v;
-    if (g === 'c') return coreBucket(c) === v;
+    if (g === 'c') return v === 'top' ? ['A*', 'A'].includes(coreBucket(c)) : coreBucket(c) === v;
     return true;
   }
   function applyFilter(rec) { if (MODE === 'profile') rec.el.style.display = matchesFilter(rec) ? '' : 'none'; }

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "JournalLens — Journal Rank, Impact & Author Order",
   "short_name": "JournalLens",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Scopus quartile & CiteScore, Web of Science index, Impact Factor and CORE conference rank from official sources, with author order and charts on Google Scholar. By Dr. Mohammed Tawfik.",
   "icons": {
     "16": "icons/icon16.png",
